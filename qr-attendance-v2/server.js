@@ -55,6 +55,20 @@ app.delete('/api/events/:id',auth,wrap(async(q,s)=>{await db.query('DELETE FROM 
 // ---- participants admin
 app.get('/api/admin/participants',auth,wrap(async(q,s)=>{const t=`%${q.query.search||''}%`;
  s.json((await db.query('SELECT id,name,email,phone FROM participants WHERE name ILIKE $1 OR email ILIKE $1 ORDER BY name LIMIT 500',[t])).rows)}));
+app.post('/api/admin/participants',auth,wrap(async(q,s)=>{
+ const b=q.body||{},name=String(b.name||'').trim().slice(0,120),phone=String(b.phone||'').replace(/\s/g,'').slice(0,20);
+ let email=String(b.email||'').trim().toLowerCase();
+ if(!name)return s.status(400).json({error:'Name is required.'});
+ if(email&&!EMAIL.test(email))return s.status(400).json({error:'Enter a valid email or leave it blank.'});
+ if(!email)email='walkin-'+crypto.randomBytes(5).toString('hex')+'@onspot.local';
+ let existed=false;
+ let {rows:[p]}=await db.query('INSERT INTO participants(name,email,phone) VALUES($1,$2,$3) ON CONFLICT(email) DO NOTHING RETURNING *',[name,email,phone||null]);
+ if(!p){existed=true;p=(await db.query('SELECT * FROM participants WHERE email=$1',[email])).rows[0]}
+ let marked=false,note='';
+ if(b.eventId){const {rows:[ev]}=await db.query('SELECT * FROM events WHERE id=$1',[+b.eventId||0]);
+  if(!ev)note='Event not found.';else if(ev.status!=='open')note='Event is closed, attendance not marked.';
+  else{const r=await db.query('INSERT INTO attendance(participant_id,event_id,marked_by) VALUES($1,$2,$3) ON CONFLICT(participant_id,event_id) DO NOTHING RETURNING id',[p.id,ev.id,q.admin.id]);marked=r.rows.length>0;if(!marked)note='Already marked present.'}}
+ s.json({name:p.name,email:p.email,existed,marked,note,qr:await QR.toDataURL(tokenFor(p),{width:600,margin:2,errorCorrectionLevel:'M'})})}));
 app.post('/api/admin/participants/:id/revoke-qr',auth,wrap(async(q,s)=>{await db.query('UPDATE participants SET qr_version=qr_version+1,updated_at=now() WHERE id=$1',[q.params.id]);s.json({ok:true})}));
 // ---- report
 async function report(eventId,f={}){
