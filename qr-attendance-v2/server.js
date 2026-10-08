@@ -7,7 +7,7 @@ if(!DATABASE_URL||!JWT_SECRET||!QR_SECRET){console.error('Set DATABASE_URL, JWT_
 const db=new Pool({max:3,connectionString:DATABASE_URL,ssl:process.env.PGSSL?{rejectUnauthorized:false}:undefined});
 const app=express(),up=multer({storage:multer.memoryStorage(),limits:{fileSize:5e6}});
 app.set('trust proxy',1);
-let ready;const init=()=>ready||(ready=(async()=>{if(ADMIN_EMAIL&&ADMIN_PASSWORD)await db.query('INSERT INTO admins(email,password_hash) VALUES($1,$2) ON CONFLICT(email) DO NOTHING',[ADMIN_EMAIL.toLowerCase(),await bcrypt.hash(ADMIN_PASSWORD,12)])})());
+let ready;const init=()=>ready||(ready=(async()=>{await db.query("ALTER TABLE participants ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'import'");if(ADMIN_EMAIL&&ADMIN_PASSWORD)await db.query('INSERT INTO admins(email,password_hash) VALUES($1,$2) ON CONFLICT(email) DO NOTHING',[ADMIN_EMAIL.toLowerCase(),await bcrypt.hash(ADMIN_PASSWORD,12)])})());
 app.use((q,s,n)=>init().then(()=>n()).catch(e=>{ready=null;console.error(e);s.status(500).json({error:'Server error'})}));
 app.use(helmet({contentSecurityPolicy:false}),express.json({limit:'100kb'}),cookie());
 const wrap=f=>(q,s,n)=>f(q,s,n).catch(e=>{console.error(e);s.status(500).json({error:'Server error'})});
@@ -62,20 +62,26 @@ app.post('/api/admin/participants',auth,wrap(async(q,s)=>{
  if(email&&!EMAIL.test(email))return s.status(400).json({error:'Enter a valid email or leave it blank.'});
  if(!email)email='walkin-'+crypto.randomBytes(5).toString('hex')+'@onspot.local';
  let existed=false;
- let {rows:[p]}=await db.query('INSERT INTO participants(name,email,phone) VALUES($1,$2,$3) ON CONFLICT(email) DO NOTHING RETURNING *',[name,email,phone||null]);
+ let {rows:[p]}=await db.query('INSERT INTO participants(name,email,phone,source) VALUES($1,$2,$3,$4) ON CONFLICT(email) DO NOTHING RETURNING *',[name,email,phone||null,'walkin']);
  if(!p){existed=true;p=(await db.query('SELECT * FROM participants WHERE email=$1',[email])).rows[0]}
  let marked=false,note='';
  if(b.eventId){const {rows:[ev]}=await db.query('SELECT * FROM events WHERE id=$1',[+b.eventId||0]);
   if(!ev)note='Event not found.';else if(ev.status!=='open')note='Event is closed, attendance not marked.';
   else{const r=await db.query('INSERT INTO attendance(participant_id,event_id,marked_by) VALUES($1,$2,$3) ON CONFLICT(participant_id,event_id) DO NOTHING RETURNING id',[p.id,ev.id,q.admin.id]);marked=r.rows.length>0;if(!marked)note='Already marked present.'}}
  s.json({name:p.name,email:p.email,existed,marked,note,qr:await QR.toDataURL(tokenFor(p),{width:600,margin:2,errorCorrectionLevel:'M'})})}));
+app.get('/api/admin/walkins',auth,wrap(async(q,s)=>s.json((await db.query("SELECT p.id,p.name,p.email,p.phone,(a.id IS NOT NULL) AS present FROM participants p LEFT JOIN attendance a ON a.participant_id=p.id AND a.event_id=$1 WHERE p.source='walkin' ORDER BY p.created_at DESC",[+q.query.eventId||0])).rows)));
+app.post('/api/admin/participants/delete-all',auth,wrap(async(q,s)=>{const {scope,confirm}=q.body||{};if(confirm!=='DELETE')return s.status(400).json({error:'Type DELETE to confirm.'});
+ const w={imported:"WHERE source='import'",walkin:"WHERE source='walkin'",all:''}[scope];if(w===undefined)return s.status(400).json({error:'Bad scope'});
+ const r=await db.query('DELETE FROM participants '+w);s.json({deleted:r.rowCount})}));
+app.delete('/api/admin/participants/:id',auth,wrap(async(q,s)=>{if(!/^[0-9a-f-]{36}$/.test(q.params.id))return s.status(400).json({error:'Bad id'});
+ await db.query("DELETE FROM participants WHERE id=$1 AND source='walkin'",[q.params.id]);s.json({ok:true})}));
 app.post('/api/admin/participants/:id/revoke-qr',auth,wrap(async(q,s)=>{await db.query('UPDATE participants SET qr_version=qr_version+1,updated_at=now() WHERE id=$1',[q.params.id]);s.json({ok:true})}));
 // ---- report
 async function report(eventId,f={}){
  const ev=+eventId;const w=[],a=[ev];
  if(f.search){a.push(`%${f.search}%`);w.push(`(p.name ILIKE $${a.length} OR p.email ILIKE $${a.length})`)}
  if(f.status==='present')w.push('a.id IS NOT NULL');if(f.status==='absent')w.push('a.id IS NULL');
- return (await db.query(`SELECT p.name,p.phone,p.email,e.name AS event,CASE WHEN a.id IS NULL THEN 'Absent' ELSE 'Present' END AS status,a.marked_at FROM participants p CROSS JOIN events e LEFT JOIN attendance a ON a.participant_id=p.id AND a.event_id=e.id WHERE e.id=$1 ${w.length?'AND '+w.join(' AND '):''} ORDER BY a.marked_at DESC NULLS LAST,p.name`,a)).rows}
+ return (await db.query(`SELECT p.id AS participant_id,p.name,p.phone,p.email,e.name AS event,CASE WHEN a.id IS NULL THEN 'Absent' ELSE 'Present' END AS status,a.marked_at FROM participants p CROSS JOIN events e LEFT JOIN attendance a ON a.participant_id=p.id AND a.event_id=e.id WHERE e.id=$1 ${w.length?'AND '+w.join(' AND '):''} ORDER BY a.marked_at DESC NULLS LAST,p.name`,a)).rows}
 app.get('/api/attendance',auth,wrap(async(q,s)=>s.json(await report(q.query.eventId,q.query))));
 app.get('/api/attendance/stats',auth,wrap(async(q,s)=>{
  const {rows:[r]}=await db.query('SELECT (SELECT count(*) FROM participants)::int total,(SELECT count(*) FROM attendance WHERE event_id=$1)::int present,(SELECT count(*) FROM events)::int events',[+q.query.eventId||0]);
