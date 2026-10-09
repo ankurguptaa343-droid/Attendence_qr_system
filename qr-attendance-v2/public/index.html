@@ -26,6 +26,7 @@ padding:calc(20px + env(safe-area-inset-top,0px)) 14px calc(28px + env(safe-area
 .eyebrow{margin-top:30px;font-size:14px;font-weight:700}.eyebrow span{color:var(--acc)}
 h1{margin-top:12px;font-size:clamp(40px,11vw,72px);line-height:.95;font-weight:700;letter-spacing:-.045em;text-transform:uppercase}
 .by{margin-top:14px;color:var(--mute);font-size:clamp(15px,3.6vw,19px)}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fld{margin-top:16px}@media(max-width:600px){.f2{grid-template-columns:1fr}}
 .sec{margin:34px 0 14px;font-size:12px;color:var(--mute)}
 .lblrow{display:flex;justify-content:space-between;margin:0 0 10px}
 .lblrow label{font-weight:600;font-size:15px}.lblrow span{font-size:11px;color:var(--mute)}
@@ -74,8 +75,12 @@ footer{text-align:center;color:#59615d;font-size:11px;margin-top:26px}
   <p class="by">Organized by Vision CSE - Technical Society of MANIT</p>
 
   <div class="sec mono">Verify your registration</div>
-  <div class="lblrow"><label for="e">Registered Email ID</label><span class="mono">Required</span></div>
-  <input id="e" class="inp" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="name@example.com">
+  <div class="f2">
+    <div><div class="lblrow"><label for="nm">Full Name</label><span class="mono">Required</span></div><input id="nm" class="inp" autocomplete="name" placeholder="Enter your full name"></div>
+    <div><div class="lblrow"><label for="ph">Contact Number</label><span class="mono">Email or Phone</span></div><input id="ph" class="inp" type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 9876543210"></div>
+  </div>
+  <div class="fld"><div class="lblrow"><label for="e">Email ID</label><span class="mono">Email or Phone</span></div><input id="e" class="inp" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="name@example.com"></div>
+  <p style="margin-top:14px;color:var(--mute);font-size:14px">Enter your name plus <b style="color:var(--ink)">either</b> your email <b style="color:var(--ink)">or</b> your phone number. Made a typo in your email while registering? Just use your phone number.</p>
   <div id="msg" class="msg" role="alert"></div>
   <button id="go" class="go"><span class="spin"></span><span id="gt">Generate My QR</span></button>
 
@@ -91,10 +96,9 @@ footer{text-align:center;color:#59615d;font-size:11px;margin-top:26px}
 
   <div class="sec mono">How it works</div>
   <div class="opts">
-    <div class="opt"><i>1</i><span>Enter the email you used to register.</span></div>
+    <div class="opt"><i>1</i><span>Enter your name and your email or phone number.</span></div>
     <div class="opt"><i>2</i><span>Download or screenshot your QR. Your name is printed on it.</span></div>
     <div class="opt"><i>3</i><span>Show it at the entry desk to get your attendance marked.</span></div>
-     <div class="opt"><i>4</i><span>Please make sure to bring your college ID card with you.</span></div>
   </div>
   <footer class="mono">Vision CSE · MANIT Bhopal</footer>
 </div>
@@ -118,10 +122,13 @@ function drawQR(src,name){
   im.src=src;
 }
 function go(){
-  msg('');const email=$('e').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return msg('Please enter a valid email address.');
+  msg('');const email=$('e').value.trim(),name=$('nm').value.trim(),phone=$('ph').value.trim();
+  if(!name)return msg('Please enter your full name.');
+  if(!email&&!phone)return msg('Please enter your email or your phone number.');
+  if(phone&&phone.replace(/\D/g,'').length<10)return msg('Please enter a valid 10-digit phone number.');
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return msg('Please enter a valid email address, or leave it blank.');
   const b=$('go');b.disabled=true;b.classList.add('loading');$('gt').textContent='Checking…';$('out').classList.remove('show');
-  fetch('/api/participants/verify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})})
+  fetch('/api/participants/verify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,phone})})
   .then(async r=>({r,d:await r.json()}))
   .then(({r,d})=>{
     if(!r.ok)return msg(d.error||'Something went wrong.');
@@ -135,7 +142,7 @@ function go(){
   .finally(()=>{b.disabled=false;b.classList.remove('loading');$('gt').textContent='Generate My QR'});
 }
 $('go').onclick=go;
-$('e').addEventListener('keydown',e=>{if(e.key==='Enter')go()});
+['nm','ph','e'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')go()}));
 $('dl').onclick=()=>{if(!url)return;const a=document.createElement('a');a.href=url;a.download='CodeCrux-QR-'+who.replace(/\s+/g,'-')+'.png';a.click()};
 $('pr').onclick=()=>{if(!url)return;const w=window.open('');w.document.write('<img src="'+url+'" style="width:100%;max-width:420px;display:block;margin:auto">');w.document.close();w.focus();setTimeout(()=>w.print(),300)};
 $('sh').onclick=async()=>{
