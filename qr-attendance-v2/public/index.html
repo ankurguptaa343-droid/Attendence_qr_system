@@ -3,112 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Vision CSE · CodeCrux 2.0 — Get Your QR</title>
+<title>CodeCrux 2.0 | Get Your QR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0b1020;--card:#ffffff;--ink:#0f172a;--mute:#64748b;--line:#e2e8f0;--brand:#6366f1;--brand2:#8b5cf6;--ok:#16a34a;--okbg:#dcfce7;--warn:#b45309;--warnbg:#fef3c7;--err:#b91c1c;--errbg:#fee2e2}
+:root{--bg:#060807;--card:#0b0d0c;--box:#101312;--line:#1f2a25;--glow:#22e57a;--ink:#f1f5f3;--mute:#8a948f;--acc:#22e57a}
 *{box-sizing:border-box;margin:0}
-html,body{min-height:100%}
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:env(safe-area-inset-bottom,0)}
-.hero{position:relative;overflow:hidden;text-align:center;color:#fff;padding:calc(36px + env(safe-area-inset-top,0)) 20px 96px;background:radial-gradient(900px 400px at 15% -10%,#4f46e5aa,transparent 60%),radial-gradient(700px 400px at 90% 0,#a855f7aa,transparent 60%),linear-gradient(180deg,#0b1020,#111a3a)}
-.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;filter:blur(60px);opacity:.35}
-.hero:before{width:220px;height:220px;background:#22d3ee;left:-60px;top:40px}
-.hero:after{width:260px;height:260px;background:#f472b6;right:-80px;bottom:-60px}
-.hero>*{position:relative;z-index:1}
-.eyebrow{display:inline-block;padding:6px 14px;border:1px solid #ffffff40;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;background:#ffffff14;backdrop-filter:blur(6px)}
-h1{margin-top:16px;font-size:clamp(34px,9vw,56px);line-height:1.05;font-weight:800;letter-spacing:-.02em}
-h1 span{background:linear-gradient(90deg,#67e8f9,#c4b5fd,#f9a8d4);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{margin-top:12px;color:#cbd5e1;font-size:clamp(14px,3.8vw,17px)}
-main{max-width:480px;margin:-64px auto 0;padding:0 16px 32px;position:relative;z-index:2}
-.card{background:var(--card);border-radius:24px;padding:24px 20px;box-shadow:0 20px 50px -12px #0006;margin-bottom:16px}
-.card h2{font-size:20px;font-weight:700}
-.hint{color:var(--mute);font-size:14px;margin-top:6px}
-label{display:block;margin:20px 0 8px;font-size:13px;font-weight:600;color:#334155}
-.field{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:0 14px;background:#f8fafc;transition:.15s}
-.field:focus-within{border-color:var(--brand);background:#fff;box-shadow:0 0 0 4px #6366f11f}
-.field svg{flex:none;color:var(--mute)}
-input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:16px;padding:15px 0;color:var(--ink)}
-button{font:inherit;cursor:pointer;border:0;border-radius:14px;min-height:52px;width:100%;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s,opacity .15s}
-button:active{transform:scale(.98)}
-button:disabled{opacity:.7;cursor:not-allowed}
-.primary{margin-top:16px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 10px 24px -8px #6366f199}
-.ghost{background:#eef2ff;color:#3730a3}
+body{min-height:100vh;font-family:'Space Grotesk',system-ui,sans-serif;color:var(--ink);background:
+radial-gradient(900px 500px at 50% -10%,#22e57a1f,transparent 60%),
+linear-gradient(#ffffff08 1px,transparent 1px) 0 0/44px 44px,linear-gradient(90deg,#ffffff08 1px,transparent 1px) 0 0/44px 44px,var(--bg);
+padding:calc(20px + env(safe-area-inset-top,0px)) 14px calc(28px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;background:linear-gradient(180deg,#0e1210,var(--card));border:1px solid #22e57a55;border-radius:36px;padding:26px 22px;box-shadow:0 0 0 1px #22e57a14,0 30px 80px -20px #22e57a33}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{flex:none;width:54px;height:54px;border-radius:16px;border:1px solid #22e57a55;background:#0d1a13;display:grid;place-items:center;overflow:hidden;font-weight:700;color:var(--acc);font-size:22px}
+.logo img{width:100%;height:100%;object-fit:contain}
+.mono{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.22em}
+.brand small{display:block;font-size:11px;color:var(--mute)}.brand b{font-size:16px;letter-spacing:.12em;text-transform:uppercase}
+.chip2{display:flex;align-items:center;gap:10px;border:1px solid #22e57a40;border-radius:18px;padding:8px 12px;background:#0d1a13}
+.chip2 .logo{width:40px;height:40px;border-radius:50%;font-size:13px}.chip2 small{font-size:10px;color:var(--mute);display:block}.chip2 b{font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.eyebrow{margin-top:30px;font-size:14px;font-weight:700}.eyebrow span{color:var(--acc)}
+h1{margin-top:12px;font-size:clamp(40px,11vw,72px);line-height:.95;font-weight:700;letter-spacing:-.045em;text-transform:uppercase}
+.by{margin-top:14px;color:var(--mute);font-size:clamp(15px,3.6vw,19px)}
+.sec{margin:34px 0 14px;font-size:12px;color:var(--mute)}
+.lblrow{display:flex;justify-content:space-between;margin:0 0 10px}
+.lblrow label{font-weight:600;font-size:15px}.lblrow span{font-size:11px;color:var(--mute)}
+.inp{width:100%;background:#080a09;border:1px solid var(--line);border-radius:20px;padding:20px 22px;font:inherit;font-size:17px;color:var(--ink);outline:0;transition:.15s}
+.inp::placeholder{color:#59615d}.inp:focus{border-color:var(--acc);box-shadow:0 0 0 4px #22e57a1f}
+button{font:inherit;cursor:pointer;width:100%;border:0;min-height:60px;border-radius:20px;font-weight:700;font-size:16px;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .1s,opacity .15s}
+button:active{transform:scale(.985)}button:disabled{opacity:.65}
+.go{margin-top:18px;background:linear-gradient(135deg,#22e57a,#12b866);color:#04130a;box-shadow:0 14px 34px -12px #22e57a99}
+.ghost{background:#0d1a13;color:var(--ink);border:1px solid #22e57a40;font-size:14px}
+.msg{display:none;margin-top:14px;padding:14px 16px;border-radius:16px;background:#2a0f12;border:1px solid #7f1d1d;color:#fca5a5;font-size:15px}.msg.show{display:block;animation:shake .35s}
+.spin{width:18px;height:18px;border:3px solid #04130a44;border-top-color:#04130a;border-radius:50%;animation:sp .7s linear infinite;display:none}.loading .spin{display:inline-block}
+#out{display:none;margin-top:30px;padding-top:26px;border-top:1px solid var(--line);text-align:center}#out.show{display:block;animation:pop .4s ease}
+.who{font-size:clamp(26px,7vw,36px);font-weight:700;letter-spacing:-.03em;text-transform:uppercase;word-break:break-word}
+.mail{color:var(--mute);font-size:15px;margin-top:4px;word-break:break-all}
+.qrbox{margin:22px auto;padding:14px;border-radius:26px;background:#fff;max-width:340px;box-shadow:0 0 0 6px #22e57a22,0 0 60px -10px #22e57a66}
+canvas{display:block;width:100%;height:auto;border-radius:12px}
+.note{color:var(--mute);font-size:15px;margin-bottom:16px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.msg{margin-top:14px;padding:12px 14px;border-radius:12px;font-size:14px;font-weight:500;background:var(--errbg);color:var(--err);display:none}
-.msg.show{display:block;animation:shake .35s}
-.spin{width:18px;height:18px;border:3px solid #ffffff55;border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:none}
-.loading .spin{display:inline-block}
-#out{display:none;text-align:center}
-#out.show{display:block;animation:pop .4s ease}
-.check{width:52px;height:52px;margin:0 auto 10px;border-radius:50%;background:var(--okbg);color:var(--ok);display:grid;place-items:center}
-.who{font-size:22px;font-weight:800;letter-spacing:-.01em;word-break:break-word}
-.mail{color:var(--mute);font-size:14px;margin-top:2px;word-break:break-all}
-.qrbox{margin:18px auto;padding:12px;border-radius:20px;background:#fff;border:1.5px dashed #c7d2fe;max-width:340px}
-canvas{display:block;width:100%;height:auto;border-radius:10px}
-.note{color:var(--mute);font-size:14px;margin:4px 0 14px}
-.chips{display:flex;flex-direction:column;gap:8px;margin-top:18px}
-.chip{padding:10px 14px;border-radius:12px;font-size:14px;font-weight:600}
-.chip.ok{background:var(--okbg);color:#166534}
-.chip.no{background:var(--warnbg);color:var(--warn)}
-.steps{display:grid;gap:10px;margin-top:14px;font-size:14px;color:#475569}
-.steps div{display:flex;gap:10px;align-items:flex-start}
-.steps b{flex:none;width:24px;height:24px;border-radius:50%;background:#eef2ff;color:#4338ca;display:grid;place-items:center;font-size:12px}
-footer{text-align:center;color:#94a3b8;font-size:12px;padding:8px 16px 28px}
-@keyframes sp{to{transform:rotate(360deg)}}
-@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
-@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-@media(min-width:768px){main{max-width:520px}.card{padding:32px 28px}}
-@media print{body *{visibility:hidden}.qrbox,.qrbox *{visibility:visible}.qrbox{position:absolute;left:0;top:0}}
+.stat{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+.st{padding:14px 16px;border-radius:16px;font-weight:600;font-size:15px}.st.ok{background:#0d2a1a;border:1px solid #22e57a66;color:#6ef3a5}.st.no{background:#2a2108;border:1px solid #854d0e;color:#fcd34d}
+.opts{display:grid;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:22px;padding:16px 18px;background:var(--box)}
+.opt i{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid #22e57a66;display:grid;place-items:center;color:var(--acc);font-style:normal;font-weight:700;font-size:13px}
+.opt span{color:#cfd6d2;font-size:15px}
+footer{text-align:center;color:#59615d;font-size:11px;margin-top:26px}
+@keyframes sp{to{transform:rotate(360deg)}}@keyframes pop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media(max-width:520px){.wrap{border-radius:28px;padding:20px 16px}.chip2 div{display:none}.chip2{padding:6px}.brand b{font-size:14px}}
+@media print{body *{visibility:hidden}.qrbox,.qrbox *{visibility:visible}.qrbox{position:absolute;left:0;top:0;box-shadow:none}}
 </style>
 </head>
 <body>
-<header class="hero">
-  <span class="eyebrow">Vision CSE</span>
-  <h1><span>CodeCrux 2.0</span></h1>
-  <p class="sub">Your personal entry &amp; attendance pass</p>
-</header>
-
-<main>
-  <section class="card" id="form">
-    <h2>Get Your Attendance QR</h2>
-    <p class="hint">Enter the email you registered with. Your pass is generated instantly.</p>
-    <label for="e">Registered email</label>
-    <div class="field">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg>
-      <input id="e" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="you@example.com">
+<div class="wrap">
+  <div class="head">
+    <div class="brand">
+      <div class="logo"><img src="/vision.png" alt="" onerror="this.replaceWith(document.createTextNode('V'))"></div>
+      <div><small class="mono">Technical Society</small><b>Vision CSE</b></div>
     </div>
-    <div id="msg" class="msg" role="alert"></div>
-    <button id="go" class="primary"><span class="spin"></span><span id="gt">Generate My QR</span></button>
-  </section>
+    <div class="chip2">
+      <div class="logo"><img src="/manit.png" alt="" onerror="this.replaceWith(document.createTextNode('M'))"></div>
+      <div><small class="mono">MANIT</small><b>Bhopal</b></div>
+    </div>
+  </div>
 
-  <section class="card" id="out">
-    <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></div>
+  <div class="eyebrow mono">CodeCrux <span>2.0</span></div>
+  <h1>Attendance QR</h1>
+  <p class="by">Organized by Vision CSE - Technical Society of MANIT</p>
+
+  <div class="sec mono">Verify your registration</div>
+  <div class="lblrow"><label for="e">Registered Email ID</label><span class="mono">Required</span></div>
+  <input id="e" class="inp" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="name@example.com">
+  <div id="msg" class="msg" role="alert"></div>
+  <button id="go" class="go"><span class="spin"></span><span id="gt">Generate My QR</span></button>
+
+  <div id="out">
     <div class="who" id="n"></div>
     <div class="mail" id="m"></div>
     <div class="qrbox"><canvas id="qr"></canvas></div>
     <p class="note">Show this QR at the attendance counter.</p>
-    <button id="dl" class="primary" style="margin-top:0">⬇ Download QR</button>
-    <div class="row">
-      <button id="pr" class="ghost">🖨 Print</button>
-      <button id="sh" class="ghost">↗ Share</button>
-    </div>
-    <div class="chips" id="st"></div>
-  </section>
+    <button id="dl" class="go" style="margin-top:0">⬇ Download QR</button>
+    <div class="row"><button id="pr" class="ghost">Print</button><button id="sh" class="ghost">Share</button></div>
+    <div class="stat" id="st"></div>
+  </div>
 
-  <section class="card">
-    <h2 style="font-size:17px">How it works</h2>
-    <div class="steps">
-      <div><b>1</b><span>Enter the email you used to register.</span></div>
-      <div><b>2</b><span>Download or screenshot your QR (your name is printed on it).</span></div>
-      <div><b>3</b><span>Show it to the volunteer at the entry desk to get your attendance marked.</span></div>
-      <div><b>4</b><span>Please make sure to bring your college ID card with you as well.</span></div>
-    </div>
-  </section>
-  <footer>Vision CSE · CodeCrux 2.0</footer>
-   <footer>Designed & Developed by Ankur Gupta</footer>
-</main>
+  <div class="sec mono">How it works</div>
+  <div class="opts">
+    <div class="opt"><i>1</i><span>Enter the email you used to register.</span></div>
+    <div class="opt"><i>2</i><span>Download or screenshot your QR. Your name is printed on it.</span></div>
+    <div class="opt"><i>3</i><span>Show it at the entry desk to get your attendance marked.</span></div>
+  </div>
+  <footer class="mono">Vision CSE · MANIT Bhopal</footer>
+</div>
 
 <script>
 const $=i=>document.getElementById(i);
@@ -120,10 +108,10 @@ function drawQR(src,name){
     const c=$('qr'),x=c.getContext('2d'),w=im.width,h=im.height+110;
     c.width=w;c.height=h;x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0);
     x.fillStyle='#0f172a';x.textAlign='center';
-    let fs=48;x.font='bold '+fs+'px Inter,sans-serif';
-    while(x.measureText(name).width>w-40&&fs>16){fs-=2;x.font='bold '+fs+'px Inter,sans-serif'}
+    let fs=48;x.font='bold '+fs+'px "Space Grotesk",sans-serif';
+    while(x.measureText(name).width>w-40&&fs>16){fs-=2;x.font='bold '+fs+'px "Space Grotesk",sans-serif'}
     x.fillText(name,w/2,im.height+62);
-    x.fillStyle='#6366f1';x.font='600 26px Inter,sans-serif';x.fillText('Vision CSE · CodeCrux 2.0',w/2,im.height+98);
+    x.fillStyle='#0a9d52';x.font='600 26px "Space Grotesk",sans-serif';x.fillText('Vision CSE · CodeCrux 2.0',w/2,im.height+98);
     url=c.toDataURL('image/png');
   };
   im.src=src;
@@ -138,8 +126,8 @@ function go(){
     if(!r.ok)return msg(d.error||'Something went wrong.');
     who=d.name;$('n').textContent=d.name;$('m').textContent=d.email;drawQR(d.qr,d.name);
     const st=$('st');st.innerHTML='';
-    if(d.attendance&&d.attendance.length)d.attendance.forEach(a=>{const c=document.createElement('div');c.className='chip ok';c.textContent='✓ Present · '+a.name+' · '+new Date(a.marked_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});st.appendChild(c)});
-    else{const c=document.createElement('div');c.className='chip no';c.textContent='Attendance: Not marked yet';st.appendChild(c)}
+    if(d.attendance&&d.attendance.length)d.attendance.forEach(a=>{const c=document.createElement('div');c.className='st ok';c.textContent='✓ Present · '+a.name+' · '+new Date(a.marked_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});st.appendChild(c)});
+    else{const c=document.createElement('div');c.className='st no';c.textContent='Attendance: Not marked yet';st.appendChild(c)}
     $('out').classList.add('show');setTimeout(()=>$('out').scrollIntoView({behavior:'smooth',block:'start'}),100);
   })
   .catch(()=>msg('Network error. Please check your internet and try again.'))
@@ -147,7 +135,7 @@ function go(){
 }
 $('go').onclick=go;
 $('e').addEventListener('keydown',e=>{if(e.key==='Enter')go()});
-$('dl').onclick=()=>{if(!url)return;const a=document.createElement('a');a.href=url;a.download=('CodeCrux-QR-'+who.replace(/\s+/g,'-')+'.png');a.click()};
+$('dl').onclick=()=>{if(!url)return;const a=document.createElement('a');a.href=url;a.download='CodeCrux-QR-'+who.replace(/\s+/g,'-')+'.png';a.click()};
 $('pr').onclick=()=>{if(!url)return;const w=window.open('');w.document.write('<img src="'+url+'" style="width:100%;max-width:420px;display:block;margin:auto">');w.document.close();w.focus();setTimeout(()=>w.print(),300)};
 $('sh').onclick=async()=>{
   if(!url)return;
