@@ -24,11 +24,15 @@ app.post('/api/auth/admin/login',rl({windowMs:9e5,max:10}),wrap(async(q,s)=>{
 app.post('/api/auth/logout',(q,s)=>{s.clearCookie('sid');s.json({ok:true})});
 app.get('/api/auth/me',auth,(q,s)=>s.json(q.admin));
 // ---- participant
-app.post('/api/participants/verify-email',rl({windowMs:9e5,max:15}),wrap(async(q,s)=>{
- const email=String(q.body?.email||'').trim().toLowerCase();
- if(!EMAIL.test(email))return s.status(400).json({error:'Enter a valid email address.'});
- const {rows:[p]}=await db.query('SELECT * FROM participants WHERE email=$1',[email]);
- if(!p)return s.status(404).json({error:'This email is not registered for this program.'});
+app.post('/api/participants/verify-email',rl({windowMs:9e5,max:200}),wrap(async(q,s)=>{
+ const b=q.body||{},email=String(b.email||'').trim().toLowerCase();
+ const nn=x=>String(x||'').toLowerCase().replace(/[^\p{L}\p{N}]/gu,''),pd=x=>String(x||'').replace(/\D/g,'').slice(-10),ph=pd(b.phone);
+ if(!nn(b.name)||(!email&&!ph))return s.status(400).json({error:'Please enter your name and your email or phone number.'});
+ if(email&&!EMAIL.test(email))return s.status(400).json({error:'Enter a valid email, or leave it blank and use your phone number.'});
+ if(ph&&ph.length<10)return s.status(400).json({error:'Enter a valid 10-digit phone number.'});
+ const {rows:found}=await db.query("SELECT * FROM participants WHERE ($1<>'' AND email=$1) OR ($2<>'' AND RIGHT(regexp_replace(COALESCE(phone,''),'\\D','','g'),10)=$2)",[email,ph]);
+ const p=found.find(r=>nn(r.name)===nn(b.name));
+ if(!p)return s.status(404).json({error:'No registration found with these details. Check your name, and try your email or phone number.'});
  const {rows:att}=await db.query('SELECT e.name,a.marked_at FROM attendance a JOIN events e ON e.id=a.event_id WHERE a.participant_id=$1 ORDER BY a.marked_at DESC',[p.id]);
  s.json({name:p.name,email:p.email,qr:await QR.toDataURL(tokenFor(p),{width:600,margin:2,errorCorrectionLevel:'M'}),attendance:att})}));
 // ---- scan
